@@ -1,5 +1,5 @@
 import customtkinter as ctk
-from guiAssets import *
+from assets.guiAssets import *
 
 
 def crete_start_button(app):

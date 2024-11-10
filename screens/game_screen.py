@@ -1,5 +1,5 @@
 import customtkinter as ctk
-from guiAssets import *
+from assets.guiAssets import *
 from PIL import Image, ImageTk
 
 

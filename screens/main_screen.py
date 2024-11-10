@@ -1,5 +1,6 @@
 from PIL import Image, ImageTk
 from buttons import *
+from assets.guiAssets import *
 import pygame
 import time
 
@@ -38,7 +39,7 @@ last_width, last_height = app.winfo_width(), app.winfo_height()
 
 
 pygame.mixer.init()
-pygame.mixer.music.load("Assets/soundtrack.mp3")  # Replace with your audio file path
+pygame.mixer.music.load("assets/soundtrack.mp3")  # Replace with your audio file path
 pygame.mixer.music.set_volume(0.5)  # Set volume between 0.0 and 1.0
 pygame.mixer.music.play(-1)  # Loop indefinitely
 
