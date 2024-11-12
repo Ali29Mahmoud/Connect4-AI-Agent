@@ -3,16 +3,16 @@ cell_size = 50
 padding = 10
 
 
-icon_path = "Assets/icon.ico"
-bg_image_path = "Assets/Background.png"
+icon_path = "screens/assets/icon.ico"
+bg_image_path = "screens/assets/Background.png"
 
-circle_tile_image_path = "Assets/tile_c.png"
-umbrella_tile_image_path = "Assets/tile_u.png"
-soldier_tri_path = "Assets/Squid_soldier_triangle.png"
-soldier_cir_path = "Assets/Squid_soldier_cirkel.png"
-soldier_square_path = "Assets/Squid_soldier_square.png"
-soldier_tri_w_gun_path = "Assets/Soldier_tri_w._gun.png"
-Seon_Gi_Hun_path = "Assets/Seon_Gi-Hun.png"
+circle_tile_image_path = "C:\\Users\ALI\Desktop\CSED 5th Term\Connect4-AI-Agent\screens\\assets\\tile_c.png"
+umbrella_tile_image_path = "screens/assets/tile_u.png"
+soldier_tri_path = "screens/assets/Squid_soldier_triangle.png"
+soldier_cir_path = "screens/assets/Squid_soldier_cirkel.png"
+soldier_square_path = "screens/assets/Squid_soldier_square.png"
+soldier_tri_w_gun_path = "screens/assets/Soldier_tri_w._gun.png"
+Seon_Gi_Hun_path = "screens/assets/Seon_Gi-Hun.png"
 
 pink = "#ed1b76"
 soft_pink = "#f44786"

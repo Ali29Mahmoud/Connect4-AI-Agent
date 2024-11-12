@@ -1,5 +1,5 @@
+from game_screen import *
 import customtkinter as ctk
-from assets.guiAssets import *
 
 
 def crete_start_button(app):
@@ -13,6 +13,7 @@ def crete_start_button(app):
                                   border_color=dark_green,
                                   corner_radius=100,
                                   text='New Game',
-                                  anchor=ctk.CENTER)
+                                  anchor=ctk.CENTER,
+                                  command=initiate_game_screen)
 
     return NewGameButton
