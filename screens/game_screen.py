@@ -5,9 +5,51 @@ from PIL import Image, ImageTk
 turn = 1
 
 
+board_state = "0" * (rows * cols)
+player_scores = {1: 0, 2: 0}
+
+def get_cell(row, col):
+    return board_state[row * cols + col]
+
+def set_cell(row, col, value):
+    global board_state
+    index = row * cols + col
+    board_state = board_state[:index] + value + board_state[index + 1:]
+
+def check_connected_4(board, player):
+    def in_bounds(x, y):
+        return 0 <= x < rows and 0 <= y < cols
+
+    directions = [(0, 1), (1, 0), (1, 1), (1, -1)]
+    connected_count = 0
+
+    for row in range(rows):
+        for col in range(cols):
+            if get_cell(row, col) == str(player):
+                for dx, dy in directions:
+                    count = 1
+                    for step in range(1, 4):
+                        nx, ny = row + dx * step, col + dy * step
+                        if in_bounds(nx, ny) and get_cell(nx, ny) == str(player):
+                            count += 1
+                        else:
+                            break
+                    if count == 4:
+                        connected_count += 1
+
+    return connected_count
+
+def update_scores():
+
+    player_scores[1] = check_connected_4(board_state, 1)
+    player_scores[2] = check_connected_4(board_state, 2)
+
+    score_label_1.configure(text=f"Player 1: {player_scores[1]}")
+    score_label_2.configure(text=f"Player 2: {player_scores[2]}")
+
+
 def initiate_game_screen(app):
     app.configure(fg_color="#000000")
-    # Clear main screen widgets if necessary
     for widget in app.winfo_children():
         widget.pack_forget()
 
@@ -19,7 +61,6 @@ def initiate_game_screen(app):
     resized_image2 = original_image2.resize((cell_size, cell_size))
     u_image = ImageTk.PhotoImage(resized_image2)
 
-    # Additional assets for Squid Game theme
     soldier_tri = Image.open(soldier_tri_path)
     resized_image_soldier_tri = soldier_tri.resize((73, 125))
     soldier_tri_image = ImageTk.PhotoImage(resized_image_soldier_tri)
@@ -69,7 +110,6 @@ def initiate_game_screen(app):
     soldier_label = ctk.CTkLabel(board, image=Seon_Gi_Hun_image, text="")
     soldier_label.place(relx=1, rely=1, anchor="se", x=-420, y=-10)
 
-    # Game board setup
     main_board = ctk.CTkFrame(master=app,
                               width=cols * cell_size,
                               height=rows * cell_size + 4,
@@ -84,6 +124,36 @@ def initiate_game_screen(app):
                            bg="#249f9c",
                            highlightbackground="#249f9c")
     canvas.place(relx=0.5, rely=0.5, anchor=ctk.CENTER)
+
+    global score_label_1, score_label_2
+
+    score_board_1 = ctk.CTkFrame(master=app,
+                               height=100,
+                               width=200,
+                               bg_color="black",
+                               fg_color="black",
+                               border_color="#DA0045",
+                               border_width=5,
+                               corner_radius=50)
+
+    score_board_1.place(relx=0.15, rely=0.35, anchor=ctk.CENTER)
+
+    score_board_2 = ctk.CTkFrame(master=app,
+                               height=100,
+                               width=200,
+                               bg_color="black",
+                               fg_color="black",
+                               border_color="#DA0045",
+                               border_width=5,
+                               corner_radius=50)
+
+    score_board_2.place(relx=0.15, rely=0.6, anchor=ctk.CENTER)
+
+    score_label_1 = ctk.CTkLabel(master=score_board_1, text=f"Player 1: {player_scores[1]}", font=get_written_font(20))
+    score_label_1.place(relx=0.5, rely=0.5, anchor=ctk.CENTER)
+
+    score_label_2 = ctk.CTkLabel(master=score_board_2, text=f"Player 2: {player_scores[2]}", font=get_written_font(20))
+    score_label_2.place(relx=0.5, rely=0.5, anchor=ctk.CENTER)
 
     circle_positions = {}
     image_refs = {}
@@ -103,13 +173,17 @@ def initiate_game_screen(app):
 
             if turn == 1:
                 image_id = canvas.create_image(circle_x + cell_size // 2, circle_y + cell_size // 2 + 1, image=c_image)
+                set_cell(drop_row, circleCol, "1")
                 turn = 2
             else:
                 image_id = canvas.create_image(circle_x + cell_size // 2, circle_y + cell_size // 2 + 1, image=u_image)
+                set_cell(drop_row, circleCol, "2")
                 turn = 1
 
             image_refs[(circleCol, drop_row)] = image_id
             column_heights[circleCol] += 1
+
+            update_scores()
 
     for row in range(rows):
         for col in range(cols):

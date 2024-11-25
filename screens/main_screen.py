@@ -1,23 +1,12 @@
-from buttons import *
-from assets.guiAssets import *
+from game_screen import *
 import pygame
-import time
 
 
-def resize_bg(event):
-    global last_resize_time, last_width, last_height
-    current_time = time.time()
-
-    if current_time - last_resize_time < 0.1:
-        return
-
-    if abs(event.width - last_width) < 20 and abs(event.height - last_height) < 20:
-        return
-
-    last_resize_time = current_time
-    last_width, last_height = event.width, event.height
-
-    resized_bg_image = bg_image.resize((event.width, event.height))
+def resize_bg_to_initial():
+    global bg_photo
+    window_width = app.winfo_width()
+    window_height = app.winfo_height()
+    resized_bg_image = bg_image.resize((window_width, window_height))
     bg_photo = ImageTk.PhotoImage(resized_bg_image)
     canvas.create_image(0, 0, image=bg_photo, anchor="nw")
     canvas.bg_photo = bg_photo
@@ -45,6 +34,7 @@ app.geometry("960x650")
 app.title("Connect 4")
 app.iconbitmap(icon_path)
 bg_image = Image.open(bg_image_path)
+app.after(100, resize_bg_to_initial)
 
 canvas = ctk.CTkCanvas(app, highlightthickness=0)
 canvas.pack(fill="both", expand=True)
@@ -78,11 +68,43 @@ sound_slider = ctk.CTkSlider(app,
 sound_slider.set(10)
 sound_slider.place(relx=1, rely=1, anchor="se", x=-80, y=-16)
 
-start_button = crete_start_button(app)
-start_button.configure(command=show_game_screen)  # Updated command to call show_game_screen
+start_button = ctk.CTkButton(master=app,
+                             width=250,
+                             height=50,
+                             font=get_font(40),
+                             fg_color=dark_green,
+                             bg_color="#FED59A",
+                             hover_color=bright_green,
+                             border_color=dark_green,
+                             corner_radius=100,
+                             text='New Game',
+                             anchor=ctk.CENTER)
+start_button.configure(command=show_game_screen)
 start_button.place(relx=0.3, rely=0.5)
 
-app.bind("<Configure>", resize_bg)
+option1 = ctk.CTkCheckBox(master=app,
+                          text="Minimax without alpha-beta pruning",
+                          text_color='black',
+                          font=get_written_font(18),
+                          bg_color="#FED59A",
+                          corner_radius=20).place(relx=0.425, rely=0.65, anchor=ctk.CENTER)
+
+
+option2 = ctk.CTkCheckBox(master=app,
+                          text="Minimax with alpha-beta pruning",
+                          text_color='black',
+                          font=get_written_font(18),
+                          bg_color="#FED59A",
+                          corner_radius=20).place(relx=0.425, rely=0.7, anchor=ctk.CENTER)
+
+
+option3 = ctk.CTkCheckBox(master=app,
+                          text="Expected Minimax",
+                          text_color='black',
+                          font=get_written_font(18),
+                          bg_color="#FED59A",
+                          corner_radius=20).place(relx=0.425, rely=0.75, anchor=ctk.CENTER)
+
 app.resizable(False, False)
 
 show_main_screen()
