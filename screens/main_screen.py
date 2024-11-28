@@ -43,7 +43,7 @@ last_resize_time = 0
 last_width, last_height = app.winfo_width(), app.winfo_height()
 
 pygame.mixer.init()
-pygame.mixer.music.load("screens/assets/soundtrack.mp3")
+pygame.mixer.music.load("./assets/soundtrack.mp3")
 pygame.mixer.music.set_volume(0.1)
 pygame.mixer.music.play(-1)
 
