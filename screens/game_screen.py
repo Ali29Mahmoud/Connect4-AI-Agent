@@ -8,15 +8,19 @@ turn = 1
 board_state = "0" * (rows * cols)
 player_scores = {1: 0, 2: 0}
 
-def get_cell(row, col):
-    return board_state[row * cols + col]
+
+def get_cell(row, col, board):
+    return board[row * cols + col]
+
 
 def set_cell(row, col, value):
     global board_state
     index = row * cols + col
     board_state = board_state[:index] + value + board_state[index + 1:]
 
+
 def check_connected_4(board, player):
+
     def in_bounds(x, y):
         return 0 <= x < rows and 0 <= y < cols
 
@@ -25,12 +29,12 @@ def check_connected_4(board, player):
 
     for row in range(rows):
         for col in range(cols):
-            if get_cell(row, col) == str(player):
+            if get_cell(row, col, board) == str(player):
                 for dx, dy in directions:
                     count = 1
                     for step in range(1, 4):
                         nx, ny = row + dx * step, col + dy * step
-                        if in_bounds(nx, ny) and get_cell(nx, ny) == str(player):
+                        if in_bounds(nx, ny) and get_cell(nx, ny, board) == str(player):
                             count += 1
                         else:
                             break
@@ -39,16 +43,20 @@ def check_connected_4(board, player):
 
     return connected_count
 
+
 def update_scores():
 
     player_scores[1] = check_connected_4(board_state, 1)
     player_scores[2] = check_connected_4(board_state, 2)
 
-    score_label_1.configure(text=f"Player 1: {player_scores[1]}")
-    score_label_2.configure(text=f"Player 2: {player_scores[2]}")
+    score_label_1.configure(text=f"Human Agent: {player_scores[1]}")
+    score_label_2.configure(text=f"AI Agent: {player_scores[2]}")
 
 
-def initiate_game_screen(app):
+def initiate_game_screen(app, updated_turn):
+    global turn
+    turn = updated_turn
+
     app.configure(fg_color="#000000")
     for widget in app.winfo_children():
         widget.pack_forget()
@@ -128,31 +136,31 @@ def initiate_game_screen(app):
     global score_label_1, score_label_2
 
     score_board_1 = ctk.CTkFrame(master=app,
-                               height=100,
-                               width=200,
-                               bg_color="black",
-                               fg_color="black",
-                               border_color="#DA0045",
-                               border_width=5,
-                               corner_radius=50)
+                                 height=100,
+                                 width=200,
+                                 bg_color="black",
+                                 fg_color="black",
+                                 border_color="#DA0045",
+                                 border_width=5,
+                                 corner_radius=50)
 
     score_board_1.place(relx=0.15, rely=0.35, anchor=ctk.CENTER)
 
     score_board_2 = ctk.CTkFrame(master=app,
-                               height=100,
-                               width=200,
-                               bg_color="black",
-                               fg_color="black",
-                               border_color="#DA0045",
-                               border_width=5,
-                               corner_radius=50)
+                                 height=100,
+                                 width=200,
+                                 bg_color="black",
+                                 fg_color="black",
+                                 border_color="#DA0045",
+                                 border_width=5,
+                                 corner_radius=50)
 
     score_board_2.place(relx=0.15, rely=0.6, anchor=ctk.CENTER)
 
-    score_label_1 = ctk.CTkLabel(master=score_board_1, text=f"Player 1: {player_scores[1]}", font=get_written_font(20))
+    score_label_1 = ctk.CTkLabel(master=score_board_1, text=f"Human Agent: {player_scores[1]}", font=get_written_font(20))
     score_label_1.place(relx=0.5, rely=0.5, anchor=ctk.CENTER)
 
-    score_label_2 = ctk.CTkLabel(master=score_board_2, text=f"Player 2: {player_scores[2]}", font=get_written_font(20))
+    score_label_2 = ctk.CTkLabel(master=score_board_2, text=f"AI Agent: {player_scores[2]}", font=get_written_font(20))
     score_label_2.place(relx=0.5, rely=0.5, anchor=ctk.CENTER)
 
     circle_positions = {}

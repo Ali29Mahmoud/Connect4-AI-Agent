@@ -30,4 +30,3 @@ def get_font(size):
 def get_written_font(size):
     menu_font = ("Segoe Script", size, "bold")
     return menu_font
-

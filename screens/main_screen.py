@@ -1,4 +1,4 @@
-from game_screen import *
+from selection_screen import *
 import pygame
 
 
@@ -17,15 +17,32 @@ def show_main_screen():
     start_button.place(relx=0.3, rely=0.5)
 
 
-def show_game_screen():
+def remove_main_screen_widgets():
     canvas.pack_forget()
     start_button.place_forget()
     sound_slider.place_forget()
-    initiate_game_screen(app)
+    option1.place_forget()
+    option2.place_forget()
+    option3.place_forget()
+    levelsLabel.place_forget()
+    Levels.place_forget()
+    sound_icon.place_forget()
+
+
+def show_selection_screen():
+    remove_main_screen_widgets()
+    initiate_selection_screen(app)
 
 
 def update_sound(volume):
+    pass
     pygame.mixer.music.set_volume(float(volume) / 100)
+
+
+def handle_checkbox_click(clicked_checkbox):
+    for checkbox in checkboxes:
+        if checkbox != clicked_checkbox:
+            checkbox.deselect()
 
 
 ctk.set_appearance_mode("dark")
@@ -51,8 +68,8 @@ volume_icon = Image.open(sound_icon_path)
 volume_icon_resized = volume_icon.resize((35, 35))
 volume_icon_image = ImageTk.PhotoImage(volume_icon_resized)
 
-soldier_label = ctk.CTkLabel(app, image=volume_icon_image, text="", bg_color="#FDCF8F")
-soldier_label.place(relx=1, rely=1, anchor="se", x=-200, y=-13)
+sound_icon = ctk.CTkLabel(app, image=volume_icon_image, text="", bg_color="#FDCF8F")
+sound_icon.place(relx=1, rely=1, anchor="se", x=-200, y=-13)
 
 sound_slider = ctk.CTkSlider(app,
                              width=120,
@@ -75,11 +92,10 @@ start_button = ctk.CTkButton(master=app,
                              fg_color=dark_green,
                              bg_color="#FED59A",
                              hover_color=bright_green,
-                             border_color=dark_green,
                              corner_radius=100,
                              text='New Game',
                              anchor=ctk.CENTER)
-start_button.configure(command=show_game_screen)
+start_button.configure(command=show_selection_screen)
 start_button.place(relx=0.3, rely=0.5)
 
 option1 = ctk.CTkCheckBox(master=app,
@@ -87,7 +103,10 @@ option1 = ctk.CTkCheckBox(master=app,
                           text_color='black',
                           font=get_written_font(18),
                           bg_color="#FED59A",
-                          corner_radius=20).place(relx=0.425, rely=0.65, anchor=ctk.CENTER)
+                          hover_color=bright_green,
+                          fg_color=dark_green,
+                          corner_radius=20,
+                          command=lambda: handle_checkbox_click(option1))
 
 
 option2 = ctk.CTkCheckBox(master=app,
@@ -95,7 +114,10 @@ option2 = ctk.CTkCheckBox(master=app,
                           text_color='black',
                           font=get_written_font(18),
                           bg_color="#FED59A",
-                          corner_radius=20).place(relx=0.425, rely=0.7, anchor=ctk.CENTER)
+                          hover_color=bright_green,
+                          fg_color=dark_green,
+                          corner_radius=20,
+                          command=lambda: handle_checkbox_click(option2))
 
 
 option3 = ctk.CTkCheckBox(master=app,
@@ -103,7 +125,34 @@ option3 = ctk.CTkCheckBox(master=app,
                           text_color='black',
                           font=get_written_font(18),
                           bg_color="#FED59A",
-                          corner_radius=20).place(relx=0.425, rely=0.75, anchor=ctk.CENTER)
+                          hover_color=bright_green,
+                          fg_color=dark_green,
+                          corner_radius=20,
+                          command=lambda: handle_checkbox_click(option3))
+
+option1.place(relx=0.425, rely=0.625, anchor=ctk.CENTER)
+option2.place(relx=0.425, rely=0.69, anchor=ctk.CENTER)
+option3.place(relx=0.425, rely=0.75, anchor=ctk.CENTER)
+
+checkboxes = [option1, option2, option3]
+
+
+levelsLabel = ctk.CTkLabel(master=app,
+                           bg_color="#FED59A",
+                           text_color="Black",
+                           text="Enter number of levels",
+                           font=get_written_font(18))
+
+levelsLabel.place(relx=0.225, rely=0.825, anchor=ctk.CENTER)
+
+Levels = ctk.CTkEntry(master=app,
+                      width=100,
+                      bg_color=dark_green,
+                      fg_color=dark_green,
+                      border_color="White",
+                      corner_radius=0,
+                      font=get_written_font(18))
+Levels.place(relx=0.425, rely=0.825, anchor=ctk.CENTER)
 
 app.resizable(False, False)
 
