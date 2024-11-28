@@ -1,11 +1,12 @@
 class Node:
-    def __init__(self, col=None, val=None, alpha=None, beta=None, parent=None, children=None):
+    def __init__(self, state=None, col=None, val=None, alpha=None, beta=None, parent=None, children=None):
+        self.state = state
         self.col = col
         self.val = val
         self.alpha = alpha
         self.beta = beta
         self.parent = parent
-        self.children = children if children is not None else []
+        self.children = children or []
 
     # Getters
     def get_val(self):
