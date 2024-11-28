@@ -1,5 +1,6 @@
 class Node:
-    def __init__(self, val=None, alpha=None, beta=None, parent=None, children=None):
+    def __init__(self,state=None ,val=None, alpha=None, beta=None, parent=None, children=None):
+        self.state = state
         self.val = val
         self.alpha = alpha
         self.beta = beta
@@ -9,6 +10,9 @@ class Node:
     # Getters
     def get_val(self):
         return self.val
+    
+    def get_state(self):
+            return self.state
 
     def get_alpha(self):
         return self.alpha
@@ -37,4 +41,7 @@ class Node:
         self.children = children
 
     def set_parent(self, parent):
-        self.parent = parent
+        self.parent = parent   
+    
+    def set_state(self, state):
+        self.state = state
