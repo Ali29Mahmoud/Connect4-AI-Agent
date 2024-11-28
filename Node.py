@@ -1,6 +1,6 @@
 class Node:
-    def __init__(self,state=None ,val=None, alpha=None, beta=None, parent=None, children=None):
-        self.state = state
+    def __init__(self,col=None ,val=None, alpha=None, beta=None, parent=None, children=None):
+        self.col = col
         self.val = val
         self.alpha = alpha
         self.beta = beta
@@ -11,8 +11,8 @@ class Node:
     def get_val(self):
         return self.val
     
-    def get_state(self):
-            return self.state
+    def get_col(self):
+            return self.col
 
     def get_alpha(self):
         return self.alpha
@@ -43,5 +43,5 @@ class Node:
     def set_parent(self, parent):
         self.parent = parent   
     
-    def set_state(self, state):
-        self.state = state
+    def set_col(self, col):
+        self.col = col
