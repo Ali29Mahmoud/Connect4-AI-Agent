@@ -1,5 +1,5 @@
 class Node:
-    def __init__(self, state=None, col=None, val=None, alpha=None, beta=None, parent=None, children=None):
+    def __init__(self, state=None, col=None, val=None, alpha=None, beta=None, parent=None, children=None, type=None):
         self.state = state      # Game state at this node
         self.col = col          # Column played to reach this node
         self.val = val          # Minimax value
@@ -12,6 +12,7 @@ class Node:
         self.expanded = False   # Whether this node's children are expanded
         self.label = ""         # Label displayed on the node
         self.content = ""       # Additional information for the node
+        self.type = type
 
     # Getters
     def get_val(self):
