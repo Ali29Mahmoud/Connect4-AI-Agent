@@ -2,6 +2,7 @@ import customtkinter as ctk
 from assets.guiAssets import *
 from PIL import Image, ImageTk
 from minmax import *
+from expectiminmax import *
 
 turn = 1
 
@@ -81,7 +82,8 @@ def initiate_game_screen(app, updated_turn, algo, levels):
     if algo == "Minimax without alpha-beta pruning" or algo == "Minimax with alpha-beta pruning":
         algo_selection = {
             "Minimax without alpha-beta pruning": ai.Maximize,
-            "Minimax with alpha-beta pruning": ai.MaximizeWithPruning
+            "Minimax with alpha-beta pruning": ai.MaximizeWithPruning,
+            "Expected Minimax": ExpectiMinMax(board_state, levels, 2).solve_expectiminmax
         }
 
         if algo in algo_selection:
