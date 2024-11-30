@@ -1,12 +1,17 @@
 class Node:
     def __init__(self, state=None, col=None, val=None, alpha=None, beta=None, parent=None, children=None):
-        self.state = state
-        self.col = col
-        self.val = val
-        self.alpha = alpha
-        self.beta = beta
-        self.parent = parent
-        self.children = children or []
+        self.state = state      # Game state at this node
+        self.col = col          # Column played to reach this node
+        self.val = val          # Minimax value
+        self.alpha = alpha      # Alpha value for alpha-beta pruning
+        self.beta = beta        # Beta value for alpha-beta pruning
+        self.parent = parent    # Parent node
+        self.children = children or []  # Child nodes
+        self.x = 0              # X-coordinate for visualization
+        self.y = 0              # Y-coordinate for visualization
+        self.expanded = False   # Whether this node's children are expanded
+        self.label = ""         # Label displayed on the node
+        self.content = ""       # Additional information for the node
 
     # Getters
     def get_val(self):
@@ -47,4 +52,9 @@ class Node:
         self.col = col
 
     def add_child(self, child):
+        child.parent = self
         self.children.append(child)
+
+    def toggle(self):
+        """Toggle the expansion state of this node."""
+        self.expanded = not self.expanded
