@@ -45,19 +45,23 @@ class Connect4AI:
         self.user = user
         self.comp = comp
         self.k = k
+        self.myDict = {}
 
     def Maximize(self, state, level):
        root = Node(state=state ,col=None, val=None, alpha=None, beta=None, parent=None, children=None)
-
+       self.myDict={}
        return self.maximize(root, level), root
     
     def MaximizeWithPruning(self, state, level):
        root=Node(state=state, col=None, val=None, alpha=-math.inf, beta=math.inf, parent=None, children=None)
+       self.myDict={}
        return self.maximizeWithPruning(root, level), root
     
     def minimize(self, root, level):
         if self.terminalTest(root.state) or level == self.k:
             return None, self.eval(root.state)
+        if root.state in self.myDict:
+            return None, self.myDict[root.state]
         minChild, minUtility = None, math.inf
         for child ,col in self.getChildren(root.state, self.user):
             childN =Node(state=child ,col=col, val=None, alpha=None, beta=None, parent=root.state, children=None)
@@ -66,11 +70,14 @@ class Connect4AI:
                 minChild, minUtility = (child, col),utility
             root.add_child(childN)
             root.val = minUtility
+            self.myDict[child] = utility
         return minChild, minUtility
 
     def maximize(self,root, level):
         if self.terminalTest(root.state) or level == self.k:
             return None, self.eval(root.state)
+        if root.state in self.myDict:
+            return None, self.myDict[root.state]
         maxChild, maxUtility = None, -math.inf
         for child ,col in self.getChildren(root.state, self.comp):
             childN =Node(state=child ,col=col, val=None, alpha=None, beta=None, parent=root.state, children=None)
@@ -79,11 +86,14 @@ class Connect4AI:
                 maxChild, maxUtility = (child, col), utility
             root.add_child(childN)
             root.val = maxUtility
+            self.myDict[child] = utility
         return maxChild, maxUtility
 
     def minimizeWithPruning(self, root, level):
         if self.terminalTest(root.state) or level == self.k:
             return None, self.eval(root.state)
+        if root.state in self.myDict:
+            return None, self.myDict[root.state]
         minChild, minUtility = None, math.inf
         for child,col in self.getChildren(root.state, self.user):
             childN =Node(state=child ,col=col, val=None, alpha=root.alpha, beta=root.beta, parent=root.state, children=None)
@@ -97,11 +107,14 @@ class Connect4AI:
                 root.beta = minUtility
             root.add_child(childN)
             root.val = minUtility
+            self.myDict[child] = utility
         return minChild, minUtility
 
     def maximizeWithPruning(self,root, level):
         if self.terminalTest(root.state) or level == self.k:
             return None, self.eval(root.state)
+        if root.state in self.myDict:
+            return None, self.myDict[root.state]
         maxChild, maxUtility = None, -math.inf
         for child, col in self.getChildren(root.state, self.comp):
             childN =Node(state=child ,col=col, val=None, alpha=root.alpha, beta=root.beta, parent=root.state, children=None)
@@ -115,6 +128,7 @@ class Connect4AI:
                 root.alpha = maxUtility
             root.add_child(childN)
             root.val = maxUtility
+            self.myDict[child] = utility
         return maxChild, maxUtility
 
     def terminalTest(self, state):
