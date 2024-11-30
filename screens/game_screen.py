@@ -1,9 +1,9 @@
 import customtkinter as ctk
 from assets.guiAssets import *
 from PIL import Image, ImageTk
+from minmax import *
 
 turn = 1
-
 
 board_state = "0" * (rows * cols)
 player_scores = {1: 0, 2: 0}
@@ -19,8 +19,27 @@ def set_cell(row, col, value):
     board_state = board_state[:index] + value + board_state[index + 1:]
 
 
-def check_connected_4(board, player):
+def make_ai_move(canvas, u_image, selected_algorithm):
+    global turn, board_state, column_heights, image_refs
+    best_move, tree_root = selected_algorithm(board_state, 0)
+    circleCol = best_move[0][1]
 
+    if column_heights[circleCol] < rows:
+        drop_row = rows - 1 - column_heights[circleCol]
+        circle_x = circleCol * (cell_size + padding) + padding // 2
+        circle_y = drop_row * (cell_size + padding) + padding // 2
+
+        image_id = canvas.create_image(circle_x + cell_size // 2, circle_y + cell_size // 2 + 1, image=u_image)
+        set_cell(drop_row, circleCol, "2")
+        turn = 1
+
+        image_refs[(circleCol, drop_row)] = image_id
+        column_heights[circleCol] += 1
+
+        update_scores()
+
+
+def check_connected_4(board, player):
     def in_bounds(x, y):
         return 0 <= x < rows and 0 <= y < cols
 
@@ -45,7 +64,6 @@ def check_connected_4(board, player):
 
 
 def update_scores():
-
     player_scores[1] = check_connected_4(board_state, 1)
     player_scores[2] = check_connected_4(board_state, 2)
 
@@ -54,13 +72,20 @@ def update_scores():
 
 
 def initiate_game_screen(app, updated_turn, algo, levels):
-    global turn
+    global turn, score_label_1, score_label_2, column_heights, image_refs, circle_positions
     turn = updated_turn
 
-    print("*********************")
-    print(f"Turn: {turn}")
-    print(f"Algorithm: {algo}")
-    print(f"Levels: {levels}")
+    ai = Connect4AI(user=1, comp=2, k=levels)
+
+    selected_algorithm = None
+    if algo == "Minimax without alpha-beta pruning" or algo == "Minimax with alpha-beta pruning":
+        algo_selection = {
+            "Minimax without alpha-beta pruning": ai.Maximize,
+            "Minimax with alpha-beta pruning": ai.MaximizeWithPruning
+        }
+
+        if algo in algo_selection:
+            selected_algorithm = algo_selection[algo]
 
     app.configure(fg_color="#000000")
     for widget in app.winfo_children():
@@ -138,8 +163,6 @@ def initiate_game_screen(app, updated_turn, algo, levels):
                            highlightbackground="#249f9c")
     canvas.place(relx=0.5, rely=0.5, anchor=ctk.CENTER)
 
-    global score_label_1, score_label_2
-
     score_board_1 = ctk.CTkFrame(master=app,
                                  height=100,
                                  width=200,
@@ -162,7 +185,8 @@ def initiate_game_screen(app, updated_turn, algo, levels):
 
     score_board_2.place(relx=0.15, rely=0.6, anchor=ctk.CENTER)
 
-    score_label_1 = ctk.CTkLabel(master=score_board_1, text=f"Human Agent: {player_scores[1]}", font=get_written_font(20))
+    score_label_1 = ctk.CTkLabel(master=score_board_1, text=f"Human Agent: {player_scores[1]}",
+                                 font=get_written_font(20))
     score_label_1.place(relx=0.5, rely=0.5, anchor=ctk.CENTER)
 
     score_label_2 = ctk.CTkLabel(master=score_board_2, text=f"AI Agent: {player_scores[2]}", font=get_written_font(20))
@@ -170,13 +194,11 @@ def initiate_game_screen(app, updated_turn, algo, levels):
 
     circle_positions = {}
     image_refs = {}
-
     column_heights = [0] * cols
 
     if updated_turn == 2:
         print("AI starts")
-        updated_turn = 1
-
+        make_ai_move(canvas, u_image, selected_algorithm)
 
     def on_circle_click(event):
         global turn
@@ -193,15 +215,12 @@ def initiate_game_screen(app, updated_turn, algo, levels):
                 image_id = canvas.create_image(circle_x + cell_size // 2, circle_y + cell_size // 2 + 1, image=c_image)
                 set_cell(drop_row, circleCol, "1")
                 turn = 2
-            else:
-                image_id = canvas.create_image(circle_x + cell_size // 2, circle_y + cell_size // 2 + 1, image=u_image)
-                set_cell(drop_row, circleCol, "2")
-                turn = 1
+                image_refs[(circleCol, drop_row)] = image_id
+                column_heights[circleCol] += 1
+                update_scores()
 
-            image_refs[(circleCol, drop_row)] = image_id
-            column_heights[circleCol] += 1
-
-            update_scores()
+                # Automatically make AI move after a short delay
+                app.after(500, lambda: make_ai_move(canvas, u_image, selected_algorithm))
 
     for row in range(rows):
         for col in range(cols):
