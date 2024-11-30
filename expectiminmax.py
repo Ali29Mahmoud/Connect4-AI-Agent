@@ -1,79 +1,72 @@
+import random
 
+from Node import Node
 
 class ExpectiMinMax :
-    def __init__(self, board, max_depth , computer_player):
-        self.board = board
+    def __init__(self, state, max_depth , computer_player):
+        self.board = state
         self.depth = max_depth
         self.computer_player = computer_player ## 1 or 2
         self.opponent = 1 if computer_player == 2 else 2 ## 1 or 2
         self.best_move = None
-        self.node = {}
+        self.visited = set()
         self.row = 6
         self.col = 7
 
-    def solve_expectiminmax(self, board, player):
-        self.expectiminmax(board, self.depth , player, False, True , None)
+    def solve_expectiminmax(self):
+        root = Node(state=self.board , type="MAX" , val=0 )
+        self.expectiminmax(root , self.depth , False, True , None)
         self.best_move = self.col // 2
-        for child in self.node[board][1]:
-            if self.node[child][0] == self.node[board][0]:
-                self.best_move = self.get_best_col(board, child)
-                break
-        return self.best_move , self.node , self.node[board]
+        best_cols =[]
+        for child in root.children:
+            if root.val == child.val:
+                best_cols.append(child.col)
+        if len(best_cols) >= 1:
+            random_index = random.randrange(len(best_cols))
+            self.best_move = best_cols[random_index]
+        return self.best_move ,  root
 
-    def expectiminmax(self, board, depth, player , is_chance , is_max , col_played = None):
-        if self.is_full(board):
-            score = self.get_score(board)
-            self.node[board] = (score,[])
-            return score
-        if depth == 0:
-            score = self.evaluate(board, player)
-            self.node[board] = (score, [])
-            return score
-
+    def expectiminmax(self , root : Node , depth  , is_chance , is_max , col_played = None):
+        if self.is_full(root.state) or depth == 0:
+            root.val = self.get_score(root.state)
+            self.visited.add(root)
+            return root.val
         if is_chance:
-            return self.chance_node(board, depth, player , is_max , col_played)
+            return self.chance_node(root , depth,  is_max , col_played)
         if is_max:
-            return self.max_node(board, depth, player)
-        return self.min_node(board, depth, player)
+            return self.max_node(root, depth)
+        return self.min_node(root, depth)
 
-    def chance_node(self, board, depth, player , is_max , col_played):
+    def chance_node(self, root, depth , is_max , col_played):
+        player = self.computer_player if is_max else self.opponent
         total_score = 0
         props = [0.2 , 0.6 , 0.2]
-        children = []
         for col in range(col_played-1 , col_played+2):
-            if self.is_valid_column(board, col):
-                new_board = self.make_move(board, col, player)
-                children.append(new_board)
-                if new_board in self.node:
-                    total_score += self.node[new_board][0] * props[col - col_played + 1]
-                else:
-                    total_score += self.expectiminmax(new_board, depth - 1, player, False, is_max, None) * props[col - col_played + 1]
-        self.node[board] = (total_score, children)
+            if self.is_valid_column(root.state, col):
+                new_board = self.make_move(root.state, col, player)
+                new_type = "MAX" if is_max else "MIN"
+                child = Node(state=new_board, type=new_type, val=0)
+                root.add_child(child)
+                total_score += self.expectiminmax(child, depth - 1,False, not is_max, None) * props[col - col_played + 1]
+        root.val = total_score
         return total_score
 
-    def max_node(self, board, depth, player):
+    def max_node(self, root, depth ):
         best_score = float('-inf')
-        children = []
         for col in range(self.col):
-            if not self.is_valid_column(board, col):
-                continue
-
-            new_board = self.make_move(board, col, player)
-            children.append(new_board)
-            best_score = max( best_score , self.expectiminmax(board, depth, player, True, False , col) )
-
-        self.node[board] = (best_score, children)
+            child = Node(state=root.state, type="CHANCE", val=0 , col=col)
+            root.add_child(child)
+            best_score = max( best_score , self.expectiminmax(child, depth - 1 , True, True , col) )
+        root.val = best_score
         return best_score
-    def min_node(self, board, depth, player):
+    def min_node(self, root, depth):
         best_score = float('inf')
         children = []
         for col in range(self.col):
-            if not self.is_valid_column(board, col):
-                continue
-            new_board = self.make_move(board, col, player)
-            children.append(new_board)
-            best_score = min(best_score , self.expectiminmax(new_board, depth , player, True, True , col) )
-        self.node[board] = (best_score, children)
+            child = Node(state=root.state, type="CHANCE", val=0 , col=col)
+            root.add_child(child)
+            best_score = min(best_score , self.expectiminmax(child, depth - 1 , True, False , col) )
+        root.val = best_score
         return best_score
     def get_best_col(self , board , child):
         for col in range(len(board)):
@@ -131,13 +124,14 @@ class ExpectiMinMax :
 
 
 if __name__ == "__main__":
-    board = "000000000000000000000000000000000000000000"
-    expecti = ExpectiMinMax(board, 2, 1)
-    best_move, node, score = expecti.solve_expectiminmax(board, 1)
+    trial = "000000000000000000000000000000000000000111"
+    expecti = ExpectiMinMax(trial, 3, 1)
+    best_move, node = expecti.solve_expectiminmax()
     print("Best move:")
     print(best_move)
     print("Node:")
     print(node)
-    print("Score:")
-    print(score)
-    print(len(node))
+    print(len(node.children))
+    print(len(node.children[1].children[0].children[0].children))
+    print(node.val)
+
