@@ -53,9 +53,14 @@ def update_scores():
     score_label_2.configure(text=f"AI Agent: {player_scores[2]}")
 
 
-def initiate_game_screen(app, updated_turn):
+def initiate_game_screen(app, updated_turn, algo, levels):
     global turn
     turn = updated_turn
+
+    print("*********************")
+    print(f"Turn: {turn}")
+    print(f"Algorithm: {algo}")
+    print(f"Levels: {levels}")
 
     app.configure(fg_color="#000000")
     for widget in app.winfo_children():
@@ -167,6 +172,11 @@ def initiate_game_screen(app, updated_turn):
     image_refs = {}
 
     column_heights = [0] * cols
+
+    if updated_turn == 2:
+        print("AI starts")
+        updated_turn = 1
+
 
     def on_circle_click(event):
         global turn

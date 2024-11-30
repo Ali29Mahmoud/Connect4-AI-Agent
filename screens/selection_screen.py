@@ -1,12 +1,11 @@
 from game_screen import *
-import pygame
 
 
-def show_game_screen(app, turn):
-    initiate_game_screen(app, turn)
+def show_game_screen(app, turn, algo, levels):
+    initiate_game_screen(app, turn, algo, levels)
 
 
-def on_selection(app, starter):
+def on_selection(app, starter, algo, levels):
     ctk.CTkFrame(master=app, fg_color="black", width=400, height=200).place(relx=0.5, rely=0.8, anchor="center")
     starter_label = ctk.CTkLabel(master=app, text=f"{starter} will start", font=get_font(30), text_color="white")
     starter_label.place(relx=0.5, rely=0.7, anchor='center')
@@ -21,13 +20,13 @@ def on_selection(app, starter):
                                  width=100, height=50,
                                  text="Start Game",
                                  font=get_font(30),
-                                 command=lambda:show_game_screen(app, turn))
+                                 command=lambda:show_game_screen(app, turn, algo, levels))
 
     Start_button.configure()
     Start_button.place(relx=0.5, rely=0.8, anchor='center')
 
 
-def initiate_selection_screen(app):
+def initiate_selection_screen(app, algo, levels):
     app.configure(fg_color="black")
 
     # Title label
@@ -52,7 +51,7 @@ def initiate_selection_screen(app):
         hover_color="gray",
         width=100,
         height=100,
-        command=lambda: on_selection(app, "Human Agent")
+        command=lambda: on_selection(app, "Human Agent", algo, levels)
     )
     player1_button.place(relx=0.3, rely=0.3, anchor='center')
 
@@ -67,7 +66,7 @@ def initiate_selection_screen(app):
         hover_color="gray",
         width=100,
         height=100,
-        command=lambda: on_selection(app, "AI Agent")
+        command=lambda: on_selection(app, "AI Agent", algo, levels)
     )
     player2_button.place(relx=0.3, rely=0.5, anchor='center')
 

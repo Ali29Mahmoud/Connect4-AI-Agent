@@ -29,9 +29,33 @@ def remove_main_screen_widgets():
     sound_icon.place_forget()
 
 
-def show_selection_screen():
+def show_selection_screen(Algo, levels):
     remove_main_screen_widgets()
-    initiate_selection_screen(app)
+    initiate_selection_screen(app, Algo, levels)
+
+
+algorithm = None
+
+
+def handle_checkbox_click(clicked_checkbox):
+    global algorithm
+    for checkbox in checkboxes:
+        if checkbox != clicked_checkbox:
+            checkbox.deselect()
+    algorithm = clicked_checkbox.cget("text")
+
+
+k = None
+
+
+def validate_integer_input(value):
+    global k
+    if value.isdigit():
+        k = int(value)
+    elif value == "":
+        return True
+    else:
+        return False
 
 
 def update_sound(volume):
@@ -39,10 +63,6 @@ def update_sound(volume):
     pygame.mixer.music.set_volume(float(volume) / 100)
 
 
-def handle_checkbox_click(clicked_checkbox):
-    for checkbox in checkboxes:
-        if checkbox != clicked_checkbox:
-            checkbox.deselect()
 
 
 ctk.set_appearance_mode("dark")
@@ -95,7 +115,7 @@ start_button = ctk.CTkButton(master=app,
                              corner_radius=100,
                              text='New Game',
                              anchor=ctk.CENTER)
-start_button.configure(command=show_selection_screen)
+start_button.configure(command=lambda:show_selection_screen(algorithm, k))
 start_button.place(relx=0.3, rely=0.5)
 
 option1 = ctk.CTkCheckBox(master=app,
@@ -145,13 +165,18 @@ levelsLabel = ctk.CTkLabel(master=app,
 
 levelsLabel.place(relx=0.225, rely=0.825, anchor=ctk.CENTER)
 
+
+validate_command = app.register(validate_integer_input)
+
 Levels = ctk.CTkEntry(master=app,
                       width=100,
                       bg_color=dark_green,
                       fg_color=dark_green,
                       border_color="White",
                       corner_radius=0,
-                      font=get_written_font(18))
+                      font=get_written_font(18),
+                      validate="key",
+                      validatecommand=(validate_command, "%P"))
 Levels.place(relx=0.425, rely=0.825, anchor=ctk.CENTER)
 
 app.resizable(False, False)
