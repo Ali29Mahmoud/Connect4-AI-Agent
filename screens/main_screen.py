@@ -52,10 +52,12 @@ def validate_integer_input(value):
     global k
     if value.isdigit():
         k = int(value)
-    elif value == "":
         return True
-    else:
-        return False
+    elif value == "":
+        k = None
+        return True
+    return False
+
 
 
 def update_sound(volume):

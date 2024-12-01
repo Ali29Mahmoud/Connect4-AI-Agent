@@ -29,7 +29,7 @@ def make_ai_move(canvas, u_image, selected_algorithm, algo, levels):
         drawTreeMinMax(tree_root)
         circleCol = best_move[0][1]
     else:
-        print(board_state)
+        print(levels)
         expecti = ExpectiMinMax(board_state, levels, 2)
         best_move, node = expecti.solve_expectiminmax()
         drawExpectedMinMax(node)
