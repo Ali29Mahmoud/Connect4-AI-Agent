@@ -52,8 +52,8 @@ class Connect4AI:
 
     def Maximize(self, state, level):
         root = Node(state=state, col=None, val=None, alpha=None, beta=None, parent=None, children=None)
-
-        return self.maximize(root, level), root
+        best_move=self.maximize(root, level)
+        return (best_move[0],self.myDict[best_move].col), root
 
     def MaximizeWithPruning(self, state, level):
         root = Node(state=state, col=None, val=None, alpha=-math.inf, beta=math.inf, parent=None, children=None)
