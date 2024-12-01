@@ -31,7 +31,7 @@ def make_ai_move(canvas, u_image, selected_algorithm, algo, levels):
     else:
         print(board_state)
         expecti = ExpectiMinMax(board_state, levels, 2)
-        best_move, node = expecti.solve_expectiminmax(1, 2)
+        best_move, node = expecti.solve_expectiminmax()
         drawExpectedMinMax(node)
         circleCol = best_move
 
