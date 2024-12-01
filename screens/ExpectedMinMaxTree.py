@@ -138,11 +138,11 @@ def drawExpectedMinMax(root):
             node_width = 60
             node_height = 40
             draw_trapezoid(virtual_surface, NODE_COLOR, x, y, node_width, node_height, upside_down)
-        elif level % 3 == 1:
+        elif level % 3 == 2:
             upside_down = level % 2 != 0
             node_width = 60
             node_height = 40
-            draw_trapezoid(virtual_surface, NODE_COLOR, x, y, node_width, node_height, upside_down)
+            draw_trapezoid(virtual_surface, NODE_COLOR, x, y, node_width, node_height, True)
         else:
             node_radius = 18
             pygame.draw.circle(virtual_surface, NODE_COLOR, (x, y), node_radius)
@@ -182,7 +182,6 @@ def drawExpectedMinMax(root):
             window_x = min(node.x - scroll_x + 50, WIDTH - window_width)
             window_y = max(node.y - scroll_y - 50, 0)
 
-            # Draw the content window background
             pygame.draw.rect(screen, CONTENT_BG, (window_x, window_y, window_width, window_height))
             pygame.draw.rect(screen, BLACK, (window_x, window_y, window_width, window_height), 2)
 
@@ -194,7 +193,6 @@ def drawExpectedMinMax(root):
                 f"Beta: {node.beta}",
             ]
 
-            # Render each attribute
             for i, attr in enumerate(attributes):
                 text = font.render(attr, True, BLACK)
                 screen.blit(text, (window_x + 10, window_y + 10 + i * 20))
