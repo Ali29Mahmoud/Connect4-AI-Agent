@@ -1,51 +1,42 @@
+import copy
 import random
+import time
+from turtledemo.penrose import start
+from heuristic import Heuristic
 
-from Node import *
+from Node import Node
+from screens.minmax import check_connected_4
+
 
 class ExpectiMinMax :
-    def __init__(self, state, max_depth , computer_player):
+    def __init__(self, state, max_depth  , computer_player):
         self.board = state
         self.depth = max_depth
         self.computer_player = computer_player ## 1 or 2
         self.opponent = 1 if computer_player == 2 else 2 ## 1 or 2
         self.best_move = None
-        self.visited = set()
         self.row = 6
         self.col = 7
+        self.visited = {}
 
-    def solve_expectiminmax(self, dummy1, dummy2):
-        root = Node(state=self.board, type="MAX", val=0)
-        self.expectiminmax(root, self.depth, False, True, None)
-
-        # Find the best move by looking for the child with the best value
-        best_cols = []
-        best_value = float('-inf') if self.computer_player == 1 else float('inf')
-
+    def solve_expectiminmax(self):
+        root = Node(state=self.board , type="MAX" , val=0 )
+        self.expectiminmax(root , self.depth , False, True , None)
+        best_cols =[]
         for child in root.children:
-            if self.computer_player == 1:
-                if child.val > best_value:
-                    best_value = child.val
-                    best_cols = [child.col]  # Start with this column as the best
-                elif child.val == best_value:
-                    best_cols.append(child.col)
-            else:
-                if child.val < best_value:
-                    best_value = child.val
-                    best_cols = [child.col]  # Start with this column as the best
-                elif child.val == best_value:
-                    best_cols.append(child.col)
-
-        if len(best_cols) > 0:
-            # Randomly select from the best columns if there are multiple with equal score
+            if root.val == child.val:
+                best_cols.append(child.col)
+        if len(best_cols) >= 1:
             random_index = random.randrange(len(best_cols))
             self.best_move = best_cols[random_index]
-
-        return self.best_move, root
+        return self.best_move ,  root
 
     def expectiminmax(self , root : Node , depth  , is_chance , is_max , col_played = None):
-        if self.is_full(root.state) or depth == 0:
+        if self.is_full(root.state) :
             root.val = self.get_score(root.state)
-            self.visited.add(root)
+            return root.val
+        if depth == 0:
+            root.val = self.evaluate(root.state, self.computer_player)
             return root.val
         if is_chance:
             return self.chance_node(root , depth,  is_max , col_played)
@@ -68,21 +59,37 @@ class ExpectiMinMax :
         return total_score
 
     def max_node(self, root, depth ):
+        if root.state in self.visited:
+            root.val = self.visited[root.state][0]
+            root.children = self.visited[root.state][1].children
+            root.type = self.visited[root.state][1].type
+            return self.visited[root.state][0]
         best_score = float('-inf')
         for col in range(self.col):
+            if not self.is_valid_column(root.state, col):
+                continue
             child = Node(state=root.state, type="CHANCE", val=0 , col=col)
             root.add_child(child)
             best_score = max( best_score , self.expectiminmax(child, depth - 1 , True, True , col) )
         root.val = best_score
+        self.visited[root.state] = (best_score , root)
         return best_score
     def min_node(self, root, depth):
+        if root.state in self.visited:
+            root.val = self.visited[root.state][0]
+            root.children = self.visited[root.state][1].children
+            root.type = self.visited[root.state][1].type
+            return self.visited[root.state][0]
         best_score = float('inf')
         children = []
         for col in range(self.col):
+            if not self.is_valid_column(root.state, col):
+                continue
             child = Node(state=root.state, type="CHANCE", val=0 , col=col)
             root.add_child(child)
             best_score = min(best_score , self.expectiminmax(child, depth - 1 , True, False , col) )
         root.val = best_score
+        self.visited[root.state] = (best_score, root)
         return best_score
     def get_best_col(self , board , child):
         for col in range(len(board)):
@@ -107,11 +114,15 @@ class ExpectiMinMax :
     def get_score(self, board):
         return self.check_connected_4(board, self.computer_player) - self.check_connected_4(board, self.opponent)
     def evaluate(self, board, player):
-        return self.check_connected_4(board, self.computer_player) - self.check_connected_4(board, self.opponent)
+        score = Heuristic().heuristic(board, player)
+        real_score = self.get_score(board) * 1000
+        return score + real_score
     def is_full(self, board):
         return not any([cell == '0' for cell in board])
     def get_cell(self,row, col, board_state):
         return board_state[row * self.col + col]
+
+
 
     def check_connected_4( self ,board, player):
         def in_bounds(x, y):
@@ -141,13 +152,22 @@ class ExpectiMinMax :
 
 if __name__ == "__main__":
     trial = "000000200000012000012100112120011222011122"
-    expecti = ExpectiMinMax(trial, 5, 2)
-    best_move, node = expecti.solve_expectiminmax(1, 2)
+    trial2 ="000000000000000000000000000000000000000000"
+
+    starttime = time.time()
+    expecti = ExpectiMinMax(trial, 12, 2)
+    best_move, node = expecti.solve_expectiminmax()
+    endTime = time.time()
+    print("Time taken:")
+    print(endTime - starttime)
     print("Best move:")
     print(best_move)
     print("Node:")
     print(node)
     print(len(node.children))
-    print(len(node.children[1].children[0].children[0].children))
+    for child in node.children:
+        print(child.col)
+        print(child.val)
+        print("______________________")
     print(node.val)
 
