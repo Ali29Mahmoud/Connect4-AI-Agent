@@ -56,26 +56,6 @@ def drawTreeMinMax(root, depth):
         pygame.draw.polygon(surface, color, points)
 
 
-    # def wrap_text(text, font, max_width):
-    #     lines = []
-    #     words = text.split(" ")
-    #     current_line = ""
-    #
-    #     for word in words:
-    #         test_line = current_line + " " + word if current_line else word
-    #         test_text = font.render(test_line, True, BLACK)
-    #         if test_text.get_width() <= max_width:
-    #             current_line = test_line
-    #         else:
-    #             if current_line:
-    #                 lines.append(current_line)
-    #             current_line = word
-    #     if current_line:
-    #         lines.append(current_line)
-    #
-    #     return lines
-
-
     def get_node_level(node, level=0):
 
         if node == root:
