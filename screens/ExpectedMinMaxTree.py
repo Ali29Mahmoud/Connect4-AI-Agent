@@ -2,7 +2,7 @@ import pygame
 from pygame.locals import *
 
 
-def drawTreeMinMax(root, depth):
+def drawExpectedMinMax(root):
     VIRTUAL_WIDTH, VIRTUAL_HEIGHT = 16000, 2000
     global virtual_surface
     virtual_surface = pygame.Surface((VIRTUAL_WIDTH, VIRTUAL_HEIGHT))
@@ -25,7 +25,7 @@ def drawTreeMinMax(root, depth):
 
     font = pygame.font.SysFont(None, 24)
 
-    scroll_x = 0
+    scroll_x = (VIRTUAL_WIDTH - WIDTH) // 2
     scroll_y = 0
     dragging_horizontal = False
     dragging_vertical = False
@@ -128,21 +128,27 @@ def drawTreeMinMax(root, depth):
                     return result
         return None
 
-
     def render_tree(node, x, y, level=0, horizontal_spacing=150):
         global virtual_surface
 
         node.x, node.y = x, y
 
-
-        upside_down = level % 2 != 0
-        node_width = 60
-        node_height = 40
-
-        draw_trapezoid(virtual_surface, NODE_COLOR, x, y, node_width, node_height, upside_down)
+        if level % 3 == 0:
+            upside_down = level % 2 != 0
+            node_width = 60
+            node_height = 40
+            draw_trapezoid(virtual_surface, NODE_COLOR, x, y, node_width, node_height, upside_down)
+        elif level % 3 == 1:
+            upside_down = level % 2 != 0
+            node_width = 60
+            node_height = 40
+            draw_trapezoid(virtual_surface, NODE_COLOR, x, y, node_width, node_height, upside_down)
+        else:
+            node_radius = 18
+            pygame.draw.circle(virtual_surface, NODE_COLOR, (x, y), node_radius)
 
         value_text = font.render(str(node.val), True, BLACK)
-        text_rect = value_text.get_rect(center=(x, y + node_height // 2))
+        text_rect = value_text.get_rect(center=(x, y))
         virtual_surface.blit(value_text, text_rect)
 
         if node.expanded:
@@ -154,15 +160,12 @@ def drawTreeMinMax(root, depth):
 
                 pygame.draw.line(
                     virtual_surface, GRAY,
-                    (x, y + node_height // 2),
-                    (child_x + child_width // 2, y + node_height + 20)
+                    (x, y + 20),
+                    (child_x + child_width // 2, y + 60)
                 )
 
-                render_tree(child, child_x + child_width // 2, y + node_height + 20, level + 1, horizontal_spacing)
+                render_tree(child, child_x + child_width // 2, y + 60, level + 1, horizontal_spacing)
                 child_x += child_width
-
-
-
 
     def is_click_inside_content_window(pos, node):
         if node:
@@ -172,7 +175,6 @@ def drawTreeMinMax(root, depth):
             if (window_x <= pos[0] <= window_x + window_width) and (window_y <= pos[1] <= window_y + window_height):
                 return True
         return False
-
 
     def render_content_window(node):
         if node:
@@ -197,8 +199,6 @@ def drawTreeMinMax(root, depth):
                 text = font.render(attr, True, BLACK)
                 screen.blit(text, (window_x + 10, window_y + 10 + i * 20))
 
-
-
     def draw_scrollbars():
         pygame.draw.rect(screen, SCROLLBAR_BG,
                          (0, HEIGHT - SCROLLBAR_THICKNESS, WIDTH - SCROLLBAR_THICKNESS, SCROLLBAR_THICKNESS))
@@ -213,7 +213,6 @@ def drawTreeMinMax(root, depth):
         thumb_height = max(50, scroll_ratio_y * (HEIGHT - SCROLLBAR_THICKNESS))
         thumb_y = (scroll_y / (VIRTUAL_HEIGHT - HEIGHT)) * (HEIGHT - SCROLLBAR_THICKNESS - thumb_height)
         pygame.draw.rect(screen, SCROLLBAR_FG, (WIDTH - SCROLLBAR_THICKNESS, thumb_y, SCROLLBAR_THICKNESS, thumb_height))
-
 
     running = True
     selected_node = None

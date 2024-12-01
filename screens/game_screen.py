@@ -3,7 +3,8 @@ from assets.guiAssets import *
 from PIL import Image, ImageTk
 from minmax import *
 from expectiminmax import *
-from tree import *
+from MinMaxTree import *
+from ExpectedMinMaxTree import *
 
 turn = 1
 
@@ -25,13 +26,13 @@ def make_ai_move(canvas, u_image, selected_algorithm, algo, levels):
     global turn, board_state, column_heights, image_refs
     if algo != "Expected Minimax":
         best_move, tree_root = selected_algorithm(board_state, 0)
-        drawTreeMinMax(tree_root, levels)
+        drawTreeMinMax(tree_root)
         circleCol = best_move[0][1]
     else:
         print(board_state)
         expecti = ExpectiMinMax(board_state, levels, 2)
         best_move, node = expecti.solve_expectiminmax(1, 2)
-        print(f"best move is {best_move}")
+        drawExpectedMinMax(node)
         circleCol = best_move
 
     if column_heights[circleCol] < rows:

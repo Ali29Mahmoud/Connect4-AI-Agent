@@ -14,18 +14,33 @@ class ExpectiMinMax :
         self.col = 7
 
     def solve_expectiminmax(self, dummy1, dummy2):
+        root = Node(state=self.board, type="MAX", val=0)
+        self.expectiminmax(root, self.depth, False, True, None)
 
-        root = Node(state=self.board , type="MAX" , val=0 )
-        self.expectiminmax(root , self.depth , False, True , None)
-        self.best_move = self.col // 2
-        best_cols =[]
+        # Find the best move by looking for the child with the best value
+        best_cols = []
+        best_value = float('-inf') if self.computer_player == 1 else float('inf')
+
         for child in root.children:
-            if root.val == child.val:
-                best_cols.append(child.col)
-        if len(best_cols) >= 1:
+            if self.computer_player == 1:
+                if child.val > best_value:
+                    best_value = child.val
+                    best_cols = [child.col]  # Start with this column as the best
+                elif child.val == best_value:
+                    best_cols.append(child.col)
+            else:
+                if child.val < best_value:
+                    best_value = child.val
+                    best_cols = [child.col]  # Start with this column as the best
+                elif child.val == best_value:
+                    best_cols.append(child.col)
+
+        if len(best_cols) > 0:
+            # Randomly select from the best columns if there are multiple with equal score
             random_index = random.randrange(len(best_cols))
             self.best_move = best_cols[random_index]
-        return self.best_move ,  root
+
+        return self.best_move, root
 
     def expectiminmax(self , root : Node , depth  , is_chance , is_max , col_played = None):
         if self.is_full(root.state) or depth == 0:
