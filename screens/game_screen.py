@@ -3,6 +3,7 @@ from assets.guiAssets import *
 from PIL import Image, ImageTk
 from minmax import *
 from expectiminmax import *
+from tree import *
 
 turn = 1
 
@@ -24,6 +25,7 @@ def make_ai_move(canvas, u_image, selected_algorithm, algo, levels):
     global turn, board_state, column_heights, image_refs
     if algo != "Expected Minimax":
         best_move, tree_root = selected_algorithm(board_state, 0)
+        drawTreeMinMax(tree_root, levels)
         circleCol = best_move[0][1]
     else:
         print(board_state)
@@ -207,7 +209,7 @@ def initiate_game_screen(app, updated_turn, algo, levels):
 
     if updated_turn == 2:
         print("AI starts")
-        make_ai_move(canvas, u_image, selected_algorithm, algo, levels)
+        app.after(500, lambda: make_ai_move(canvas, u_image, selected_algorithm, algo, levels))
 
     def on_circle_click(event):
         global turn
