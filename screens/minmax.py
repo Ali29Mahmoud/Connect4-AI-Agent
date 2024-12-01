@@ -1,5 +1,6 @@
 import math
 from Node import Node
+from MinMaxTree import  drawTreeMinMax
 
 rows, cols = 6, 7
 
@@ -49,19 +50,20 @@ class Connect4AI:
 
     def Maximize(self, state, level):
        root = Node(state=state ,col=None, val=None, alpha=None, beta=None, parent=None, children=None)
-       self.myDict={}
        return self.maximize(root, level), root
     
     def MaximizeWithPruning(self, state, level):
        root=Node(state=state, col=None, val=None, alpha=-math.inf, beta=math.inf, parent=None, children=None)
-       self.myDict={}
        return self.maximizeWithPruning(root, level), root
     
     def minimize(self, root, level):
-        if self.terminalTest(root.state) or level == self.k:
-            return None, self.eval(root.state)
         if root.state in self.myDict:
-            return None, self.myDict[root.state]
+            root.val = self.myDict[root.state].val
+            root.children = self.myDict[root.state].children            
+            return None, root.val
+        if self.terminalTest(root.state) or level == self.k:
+            root.val =self.eval(root.state)
+            return None , root.val
         minChild, minUtility = None, math.inf
         for child ,col in self.getChildren(root.state, self.user):
             childN =Node(state=child ,col=col, val=None, alpha=None, beta=None, parent=root.state, children=None)
@@ -70,14 +72,17 @@ class Connect4AI:
                 minChild, minUtility = (child, col),utility
             root.add_child(childN)
             root.val = minUtility
-            self.myDict[child] = utility
+            self.myDict[child] = childN
         return minChild, minUtility
 
     def maximize(self,root, level):
-        if self.terminalTest(root.state) or level == self.k:
-            return None, self.eval(root.state)
         if root.state in self.myDict:
-            return None, self.myDict[root.state]
+            root.val = self.myDict[root.state].val
+            root.children = self.myDict[root.state].children     
+            return None, root.val
+        if self.terminalTest(root.state) or level == self.k:
+            root.val =self.eval(root.state)
+            return None, root.val
         maxChild, maxUtility = None, -math.inf
         for child ,col in self.getChildren(root.state, self.comp):
             childN =Node(state=child ,col=col, val=None, alpha=None, beta=None, parent=root.state, children=None)
@@ -86,14 +91,14 @@ class Connect4AI:
                 maxChild, maxUtility = (child, col), utility
             root.add_child(childN)
             root.val = maxUtility
-            self.myDict[child] = utility
+            self.myDict[child] = childN
         return maxChild, maxUtility
 
     def minimizeWithPruning(self, root, level):
+        prune=False
         if self.terminalTest(root.state) or level == self.k:
-            return None, self.eval(root.state)
-        if root.state in self.myDict:
-            return None, self.myDict[root.state]
+            root.val =self.eval(root.state)
+            return None, root.val
         minChild, minUtility = None, math.inf
         for child,col in self.getChildren(root.state, self.user):
             childN =Node(state=child ,col=col, val=None, alpha=root.alpha, beta=root.beta, parent=root.state, children=None)
@@ -101,20 +106,20 @@ class Connect4AI:
             if utility < minUtility:
                 minChild, minUtility = (child, col),utility
             if minUtility <= root.alpha:
-                print("pruning")
-                break
+                prune =True
             if minUtility < root.beta:
                 root.beta = minUtility
             root.add_child(childN)
             root.val = minUtility
-            self.myDict[child] = utility
+            if(prune):
+                break
         return minChild, minUtility
 
     def maximizeWithPruning(self,root, level):
+        prune=False
         if self.terminalTest(root.state) or level == self.k:
-            return None, self.eval(root.state)
-        if root.state in self.myDict:
-            return None, self.myDict[root.state]
+            root.val =self.eval(root.state)
+            return None , root.val
         maxChild, maxUtility = None, -math.inf
         for child, col in self.getChildren(root.state, self.comp):
             childN =Node(state=child ,col=col, val=None, alpha=root.alpha, beta=root.beta, parent=root.state, children=None)
@@ -122,13 +127,13 @@ class Connect4AI:
             if utility > maxUtility:
                 maxChild, maxUtility = (child, col),utility
             if maxUtility >= root.beta:
-                print("pruning")
-                break
+                prune = True
             if maxUtility > root.alpha:
                 root.alpha = maxUtility
             root.add_child(childN)
             root.val = maxUtility
-            self.myDict[child] = utility
+            if(prune):
+                break
         return maxChild, maxUtility
 
     def terminalTest(self, state):
@@ -155,7 +160,7 @@ class Connect4AI:
 if __name__ == "__main__":
     # Initial empty board
     initial_state = '200000010000002000001200000120000012100001'
-
+ 
     # Initialize the AI with arbitrary player IDs and depth (k)
     ai = Connect4AI(user=1, comp=2, k=3)  # User is 1, Computer is 2, depth is 3
 
@@ -164,9 +169,10 @@ if __name__ == "__main__":
     best_move, minimax_tree = ai.Maximize(initial_state, 0)
     print(f"Best move without pruning: {best_move}")
     print(f"Minimax tree root value: {minimax_tree.val}")
-
+    minimax_trees = drawTreeMinMax(minimax_tree)
     # Test Minimax with alpha-beta pruning
     print("\nTesting Minimax with alpha-beta pruning...")
     best_move_pruned, pruned_tree = ai.MaximizeWithPruning(initial_state, 0)
     print(f"Best move with pruning: {best_move_pruned}")
     print(f"Pruned tree root value: {pruned_tree.val}")
+    #minimax_trees = drawTreeMinMax(pruned_tree)
