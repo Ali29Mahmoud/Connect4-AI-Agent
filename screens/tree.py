@@ -2,27 +2,19 @@ import pygame
 from pygame.locals import *
 
 
-
 def drawTreeMinMax(root, depth):
-    VIRTUAL_WIDTH, VIRTUAL_HEIGHT = 16000, 2000  # Larger virtual surface for scrolling
+    VIRTUAL_WIDTH, VIRTUAL_HEIGHT = 16000, 2000
     global virtual_surface
     virtual_surface = pygame.Surface((VIRTUAL_WIDTH, VIRTUAL_HEIGHT))
-    # Initialize Pygame
+
     pygame.init()
 
-    # Screen dimensions
     WIDTH, HEIGHT = 1200, 800
 
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption("Interactive Tree with Node Content")
-
-    # Create a virtual surface for drawing
-
-
-    # Scrollbar dimensions
     SCROLLBAR_THICKNESS = 20
 
-    # Colors
     WHITE = (255, 255, 255)
     BLACK = (0, 0, 0)
     GRAY = (200, 200, 200)
@@ -31,10 +23,8 @@ def drawTreeMinMax(root, depth):
     SCROLLBAR_BG = (220, 220, 220)
     SCROLLBAR_FG = (180, 180, 180)
 
-    # Font
     font = pygame.font.SysFont(None, 24)
 
-    # Scroll position
     scroll_x = 0
     scroll_y = 0
     dragging_horizontal = False
@@ -51,39 +41,39 @@ def drawTreeMinMax(root, depth):
         bottom_width = width
         if upside_down:
             points = [
-                (x - bottom_width // 2, y),  # top-left
-                (x + bottom_width // 2, y),  # top-right
-                (x + top_width // 2, y + height),  # bottom-right
-                (x - top_width // 2, y + height)  # bottom-left
+                (x - bottom_width // 2, y),
+                (x + bottom_width // 2, y),
+                (x + top_width // 2, y + height),
+                (x - top_width // 2, y + height)
             ]
         else:
             points = [
-                (x - top_width // 2, y),  # top-left
-                (x + top_width // 2, y),  # top-right
-                (x + bottom_width // 2, y + height),  # bottom-right
-                (x - bottom_width // 2, y + height)  # bottom-left
+                (x - top_width // 2, y),
+                (x + top_width // 2, y),
+                (x + bottom_width // 2, y + height),
+                (x - bottom_width // 2, y + height)
             ]
         pygame.draw.polygon(surface, color, points)
 
 
-    def wrap_text(text, font, max_width):
-        lines = []
-        words = text.split(" ")
-        current_line = ""
-
-        for word in words:
-            test_line = current_line + " " + word if current_line else word
-            test_text = font.render(test_line, True, BLACK)
-            if test_text.get_width() <= max_width:
-                current_line = test_line
-            else:
-                if current_line:
-                    lines.append(current_line)
-                current_line = word
-        if current_line:
-            lines.append(current_line)
-
-        return lines
+    # def wrap_text(text, font, max_width):
+    #     lines = []
+    #     words = text.split(" ")
+    #     current_line = ""
+    #
+    #     for word in words:
+    #         test_line = current_line + " " + word if current_line else word
+    #         test_text = font.render(test_line, True, BLACK)
+    #         if test_text.get_width() <= max_width:
+    #             current_line = test_line
+    #         else:
+    #             if current_line:
+    #                 lines.append(current_line)
+    #             current_line = word
+    #     if current_line:
+    #         lines.append(current_line)
+    #
+    #     return lines
 
 
     def get_node_level(node, level=0):
@@ -106,7 +96,6 @@ def drawTreeMinMax(root, depth):
 
 
     def is_point_in_polygon(x, y, points):
-        """Ray casting algorithm to determine if point is inside polygon"""
         n = len(points)
         inside = False
 
@@ -122,40 +111,36 @@ def drawTreeMinMax(root, depth):
 
 
     def get_clicked_node(node, pos):
-        # Adjust click position for scrolling
         adjusted_x = pos[0] + scroll_x
         adjusted_y = pos[1] + scroll_y
 
-        # Define trapezoid boundaries
         node_width = 60
         node_height = 40
         level = get_node_level(node)
         upside_down = level % 2 != 0
 
-        # Calculate trapezoid points
+
         top_width = node_width // 2
         bottom_width = node_width
 
         if upside_down:
             points = [
-                (node.x - bottom_width // 2, node.y),  # top-left
-                (node.x + bottom_width // 2, node.y),  # top-right
-                (node.x + top_width // 2, node.y + node_height),  # bottom-right
-                (node.x - top_width // 2, node.y + node_height)  # bottom-left
+                (node.x - bottom_width // 2, node.y),
+                (node.x + bottom_width // 2, node.y),
+                (node.x + top_width // 2, node.y + node_height),
+                (node.x - top_width // 2, node.y + node_height)
             ]
         else:
             points = [
-                (node.x - top_width // 2, node.y),  # top-left
-                (node.x + top_width // 2, node.y),  # top-right
-                (node.x + bottom_width // 2, node.y + node_height),  # bottom-right
-                (node.x - bottom_width // 2, node.y + node_height)  # bottom-left
+                (node.x - top_width // 2, node.y),
+                (node.x + top_width // 2, node.y),
+                (node.x + bottom_width // 2, node.y + node_height),
+                (node.x - bottom_width // 2, node.y + node_height)
             ]
 
-        # Check if click is inside trapezoid
         if is_point_in_polygon(adjusted_x, adjusted_y, points):
             return node
 
-        # Check children if expanded
         if node.expanded:
             for child in node.children:
                 result = get_clicked_node(child, pos)
@@ -167,23 +152,19 @@ def drawTreeMinMax(root, depth):
     def render_tree(node, x, y, level=0, horizontal_spacing=150):
         global virtual_surface
 
-        # Set the node's position
         node.x, node.y = x, y
 
-        # Determine trapezoid orientation
+
         upside_down = level % 2 != 0
         node_width = 60
         node_height = 40
 
-        # Draw the trapezoid representing the node
         draw_trapezoid(virtual_surface, NODE_COLOR, x, y, node_width, node_height, upside_down)
 
-        # Render the node's value in the trapezoid
         value_text = font.render(str(node.val), True, BLACK)
         text_rect = value_text.get_rect(center=(x, y + node_height // 2))
         virtual_surface.blit(value_text, text_rect)
 
-        # If the node is expanded, recursively draw its children
         if node.expanded:
             total_width = calculate_subtree_width(node, horizontal_spacing)
             child_x = x - total_width // 2
@@ -191,14 +172,12 @@ def drawTreeMinMax(root, depth):
             for child in node.children:
                 child_width = calculate_subtree_width(child, horizontal_spacing)
 
-                # Draw connecting lines to children
                 pygame.draw.line(
                     virtual_surface, GRAY,
                     (x, y + node_height // 2),
                     (child_x + child_width // 2, y + node_height + 20)
                 )
 
-                # Recursively render the subtree
                 render_tree(child, child_x + child_width // 2, y + node_height + 20, level + 1, horizontal_spacing)
                 child_x += child_width
 
@@ -241,7 +220,6 @@ def drawTreeMinMax(root, depth):
 
 
     def draw_scrollbars():
-        # Horizontal scrollbar
         pygame.draw.rect(screen, SCROLLBAR_BG,
                          (0, HEIGHT - SCROLLBAR_THICKNESS, WIDTH - SCROLLBAR_THICKNESS, SCROLLBAR_THICKNESS))
         scroll_ratio_x = WIDTH / VIRTUAL_WIDTH
@@ -249,7 +227,6 @@ def drawTreeMinMax(root, depth):
         thumb_x = (scroll_x / (VIRTUAL_WIDTH - WIDTH)) * (WIDTH - SCROLLBAR_THICKNESS - thumb_width)
         pygame.draw.rect(screen, SCROLLBAR_FG, (thumb_x, HEIGHT - SCROLLBAR_THICKNESS, thumb_width, SCROLLBAR_THICKNESS))
 
-        # Vertical scrollbar
         pygame.draw.rect(screen, SCROLLBAR_BG,
                          (WIDTH - SCROLLBAR_THICKNESS, 0, SCROLLBAR_THICKNESS, HEIGHT - SCROLLBAR_THICKNESS))
         scroll_ratio_y = HEIGHT / VIRTUAL_HEIGHT
@@ -258,7 +235,6 @@ def drawTreeMinMax(root, depth):
         pygame.draw.rect(screen, SCROLLBAR_FG, (WIDTH - SCROLLBAR_THICKNESS, thumb_y, SCROLLBAR_THICKNESS, thumb_height))
 
 
-    # Main loop
     running = True
     selected_node = None
 
@@ -295,16 +271,12 @@ def drawTreeMinMax(root, depth):
                     scroll_ratio_y = (VIRTUAL_HEIGHT - HEIGHT) / (HEIGHT - SCROLLBAR_THICKNESS)
                     scroll_y = min(max(0, scroll_y + event.rel[1] * scroll_ratio_y), VIRTUAL_HEIGHT - HEIGHT)
 
-        # Render the tree on virtual surface
         render_tree(root, VIRTUAL_WIDTH // 2, 50, horizontal_spacing=150)
 
-        # Draw the visible portion of the virtual surface onto the screen
         screen.blit(virtual_surface, (-scroll_x, -scroll_y))
 
-        # Draw scrollbars
         draw_scrollbars()
 
-        # Render content window for the selected node
         render_content_window(selected_node)
 
         pygame.display.flip()
