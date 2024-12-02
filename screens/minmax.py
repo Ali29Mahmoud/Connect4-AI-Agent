@@ -2,7 +2,7 @@ import math
 from Node import Node
 from MinMaxTree import drawTreeMinMax
 from heuristic import Heuristic
-
+import time
 rows, cols = 6, 7
 
 board_state = "0" * (rows * cols)
@@ -62,13 +62,13 @@ class Connect4AI:
         if root.state in self.myDict:
             root.val = self.myDict[root.state].val
             root.children = self.myDict[root.state].children
-            return None, root.val
+            return (root.state , root.col), root.val
         if self.terminalTest(root.state):
             root.val = self.get_score(root.state)
-            return None, root.val
+            return (root.state , root.col), root.val
         if level == self.k:
             root.val = self.eval(root.state)
-            return None, root.val
+            return (root.state , root.col), root.val
         minChild, minUtility = None, math.inf
         for child, col in self.getChildren(root.state, self.user):
             childN = Node(state=child, col=col, val=None, alpha=None, beta=None, parent=root.state, children=None)
@@ -84,13 +84,13 @@ class Connect4AI:
         if root.state in self.myDict:
             root.val = self.myDict[root.state].val
             root.children = self.myDict[root.state].children
-            return None, root.val
+            return (root.state , root.col), root.val
         if self.terminalTest(root.state):
             root.val = self.get_score(root.state)
-            return None, root.val
+            return (root.state , root.col), root.val
         if level == self.k:
             root.val = self.eval(root.state)
-            return None, root.val
+            return (root.state , root.col), root.val
         maxChild, maxUtility = None, -math.inf
         for child, col in self.getChildren(root.state, self.comp):
             childN = Node(state=child, col=col, val=None, alpha=None, beta=None, parent=root.state, children=None)
@@ -106,10 +106,10 @@ class Connect4AI:
         prune = False
         if self.terminalTest(root.state):
             root.val = self.get_score(root.state)
-            return None, root.val
+            return (root.state , root.col), root.val
         if level == self.k:
             root.val = self.eval(root.state)
-            return None, root.val
+            return (root.state , root.col), root.val
         minChild, minUtility = None, math.inf
         for child, col in self.getChildren(root.state, self.user):
             childN = Node(state=child, col=col, val=None, alpha=root.alpha, beta=root.beta, parent=root.state,
@@ -131,10 +131,10 @@ class Connect4AI:
         prune = False
         if self.terminalTest(root.state) :
             root.val = self.get_score(root.state)
-            return None, root.val
+            return (root.state , root.col), root.val
         if level == self.k:
             root.val = self.eval(root.state)
-            return None, root.val
+            return (root.state , root.col), root.val
         maxChild, maxUtility = None, -math.inf
         for child, col in self.getChildren(root.state, self.comp):
             childN = Node(state=child, col=col, val=None, alpha=root.alpha, beta=root.beta, parent=root.state,
@@ -173,8 +173,6 @@ class Connect4AI:
                     children.append((child_state, col))
                     break
         return children
-
-
 if __name__ == "__main__":
     # Initial empty board
     initial_state = '200000010000002000001200000120000012100001'
