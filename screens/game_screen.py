@@ -27,8 +27,13 @@ def make_ai_move(canvas, u_image, selected_algorithm, algo, levels):
 
     tree_root = Node
     if algo != "Expected Minimax":
-        best_move, tree_root = selected_algorithm(board_state, 0)
-        circleCol = best_move[0][1]
+        if algo == "Minimax without alpha-beta pruning":
+            ai = Connect4AI(1, 2, levels)
+            best_move, tree_root = ai.Maximize(board_state, 0)
+            circleCol = best_move[0][1]
+        else:
+            best_move, tree_root= selected_algorithm(board_state, 0)
+            circleCol = best_move[0][1]
     else:
         print(levels)
         expecti = ExpectiMinMax(board_state, levels, 2)

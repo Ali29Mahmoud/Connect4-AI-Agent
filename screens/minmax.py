@@ -2,7 +2,7 @@ import math
 from Node import Node
 from MinMaxTree import drawTreeMinMax
 from heuristic import Heuristic
-import time
+
 rows, cols = 6, 7
 
 board_state = "0" * (rows * cols)
@@ -62,13 +62,13 @@ class Connect4AI:
         if root.state in self.myDict:
             root.val = self.myDict[root.state].val
             root.children = self.myDict[root.state].children
-            return (root.state , root.col), root.val
+            return None, root.val
         if self.terminalTest(root.state):
             root.val = self.get_score(root.state)
-            return (root.state , root.col), root.val
+            return None, root.val
         if level == self.k:
             root.val = self.eval(root.state)
-            return (root.state , root.col), root.val
+            return None, root.val
         minChild, minUtility = None, math.inf
         for child, col in self.getChildren(root.state, self.user):
             childN = Node(state=child, col=col, val=None, alpha=None, beta=None, parent=root.state, children=None)
@@ -84,13 +84,13 @@ class Connect4AI:
         if root.state in self.myDict:
             root.val = self.myDict[root.state].val
             root.children = self.myDict[root.state].children
-            return (root.state , root.col), root.val
+            return None, root.val
         if self.terminalTest(root.state):
             root.val = self.get_score(root.state)
-            return (root.state , root.col), root.val
+            return None, root.val
         if level == self.k:
             root.val = self.eval(root.state)
-            return (root.state , root.col), root.val
+            return None, root.val
         maxChild, maxUtility = None, -math.inf
         for child, col in self.getChildren(root.state, self.comp):
             childN = Node(state=child, col=col, val=None, alpha=None, beta=None, parent=root.state, children=None)
@@ -106,10 +106,10 @@ class Connect4AI:
         prune = False
         if self.terminalTest(root.state):
             root.val = self.get_score(root.state)
-            return (root.state , root.col), root.val
+            return None, root.val
         if level == self.k:
             root.val = self.eval(root.state)
-            return (root.state , root.col), root.val
+            return None, root.val
         minChild, minUtility = None, math.inf
         for child, col in self.getChildren(root.state, self.user):
             childN = Node(state=child, col=col, val=None, alpha=root.alpha, beta=root.beta, parent=root.state,
@@ -131,10 +131,10 @@ class Connect4AI:
         prune = False
         if self.terminalTest(root.state) :
             root.val = self.get_score(root.state)
-            return (root.state , root.col), root.val
+            return None, root.val
         if level == self.k:
             root.val = self.eval(root.state)
-            return (root.state , root.col), root.val
+            return None, root.val
         maxChild, maxUtility = None, -math.inf
         for child, col in self.getChildren(root.state, self.comp):
             childN = Node(state=child, col=col, val=None, alpha=root.alpha, beta=root.beta, parent=root.state,
@@ -173,6 +173,8 @@ class Connect4AI:
                     children.append((child_state, col))
                     break
         return children
+
+
 if __name__ == "__main__":
     # Initial empty board
     initial_state = '200000010000002000001200000120000012100001'
@@ -183,12 +185,19 @@ if __name__ == "__main__":
     # Test Minimax without pruning
     print("Testing Minimax without pruning...")
     best_move, minimax_tree = ai.Maximize(initial_state, 0)
-    print(f"Best move without pruning: {best_move}")
+    print(f"Best move without pruning: {best_move[0][1]}")
     print(f"Minimax tree root value: {minimax_tree.val}")
-    minimax_trees = drawTreeMinMax(minimax_tree)
-    # Test Minimax with alpha-beta pruning
-    print("\nTesting Minimax with alpha-beta pruning...")
-    best_move_pruned, pruned_tree = ai.MaximizeWithPruning(initial_state, 0)
-    print(f"Best move with pruning: {best_move_pruned}")
-    print(f"Pruned tree root value: {pruned_tree.val}")
-    # minimax_trees = drawTreeMinMax(pruned_tree)
+
+    initial_state = '000000000000000000000000000000000002000110'
+
+    print("Testing Minimax without pruning...")
+    best_move, minimax_tree = ai.Maximize(initial_state, 0)
+    print(f"Best move without pruning: {best_move[0][1]}")
+    print(f"Minimax tree root value: {minimax_tree.val}")
+    # minimax_trees = drawTreeMinMax(minimax_tree)
+    # # Test Minimax with alpha-beta pruning
+    # print("\nTesting Minimax with alpha-beta pruning...")
+    # best_move_pruned, pruned_tree = ai.MaximizeWithPruning(initial_state, 0)
+    # print(f"Best move with pruning: {best_move_pruned}")
+    # print(f"Pruned tree root value: {pruned_tree.val}")
+    # # minimax_trees = drawTreeMinMax(pruned_tree)
