@@ -24,15 +24,15 @@ def set_cell(row, col, value):
 
 def make_ai_move(canvas, u_image, selected_algorithm, algo, levels):
     global turn, board_state, column_heights, image_refs
+
+    tree_root = Node
     if algo != "Expected Minimax":
         best_move, tree_root = selected_algorithm(board_state, 0)
-        drawTreeMinMax(tree_root)
         circleCol = best_move[0][1]
     else:
-        print(board_state)
+        print(levels)
         expecti = ExpectiMinMax(board_state, levels, 2)
-        best_move, node = expecti.solve_expectiminmax()
-        drawExpectedMinMax(node)
+        best_move, tree_root = expecti.solve_expectiminmax()
         circleCol = best_move
 
     if column_heights[circleCol] < rows:
@@ -48,6 +48,11 @@ def make_ai_move(canvas, u_image, selected_algorithm, algo, levels):
         column_heights[circleCol] += 1
 
         update_scores()
+
+    if algo != "Expected Minimax":
+        drawTreeMinMax(tree_root)
+    else:
+        drawExpectedMinMax(tree_root)
 
 
 def check_connected_4(board, player):
