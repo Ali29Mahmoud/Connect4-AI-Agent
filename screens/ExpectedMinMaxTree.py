@@ -133,18 +133,14 @@ def drawExpectedMinMax(root):
 
         node.x, node.y = x, y
 
-        if level % 3 == 0:
-            upside_down = level % 2 != 0
-            node_width = 60
-            node_height = 40
+        node_width = 60
+        node_height = 40
+        node_radius = 18
+
+        if level % 2 == 0:
+            upside_down = level % 4 != 0
             draw_trapezoid(virtual_surface, NODE_COLOR, x, y, node_width, node_height, upside_down)
-        elif level % 3 == 2:
-            upside_down = level % 2 != 0
-            node_width = 60
-            node_height = 40
-            draw_trapezoid(virtual_surface, NODE_COLOR, x, y, node_width, node_height, True)
         else:
-            node_radius = 18
             pygame.draw.circle(virtual_surface, NODE_COLOR, (x, y), node_radius)
 
         value_text = font.render(str(node.val), True, BLACK)
